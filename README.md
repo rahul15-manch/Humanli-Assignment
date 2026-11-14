@@ -7,6 +7,7 @@ An end-to-end Machine Learning pipeline and Streamlit web application designed t
 ## Table of Contents
 
 - [Overview](#overview)
+- [System Architecture](#System-Architecture)
 - [Key Features](#key-features)
 - [Technology Stack](#technology-stack)
 - [Dataset](#dataset)
@@ -37,7 +38,44 @@ This project addresses these challenges by building an end-to-end, reproducible 
 - An interactive Streamlit dashboard (`CreditGuard`) supporting single-transaction scoring and batch CSV evaluation with configurable decision thresholds.
 
 ---
+## System Architecture
+```mermaid
 
+flowchart TD
+    A["Transaction Dataset<br/>fraudTrain.csv / fraudTest.csv"] --> B["Data Exploration<br/>EDA Notebooks"]
+
+    B --> C["Feature Engineering<br/>src/feature_engineering.py"]
+    C --> D["Data Preprocessing<br/>src/preprocessing.py"]
+
+    D --> E["Numerical Scaling<br/>StandardScaler"]
+    D --> F["Categorical Encoding<br/>OneHotEncoder"]
+
+    E --> G["ColumnTransformer"]
+    F --> G
+
+    G --> H["SMOTE<br/>Class Imbalance Handling"]
+    H --> I["SGDClassifier<br/>loss = log_loss"]
+
+    I --> J["Model Evaluation<br/>src/evaluate.py"]
+    J --> K["Saved Model<br/>models/best_model.pkl"]
+
+    K --> L["Prediction Module<br/>src/predict.py"]
+
+    M["User"] --> N["Streamlit Interface<br/>app.py"]
+    N --> O["Transaction Input<br/>Single / Batch CSV"]
+    O --> L
+
+    L --> P["Feature Transformation"]
+    P --> Q["Fraud Prediction"]
+
+    Q --> R["Predicted Class<br/>Legitimate / Fraudulent"]
+    Q --> S["Fraud Probability"]
+
+    R --> N
+    S --> N
+
+    N --> T["Prediction Results<br/>Visualization / CSV Export"]
+```
 ## Key Features
 
 - **Automated Feature Extraction:** Automatically parses transaction timestamps, derives cardholder age, computes spherical customer-to-merchant distances via the Haversine formula, and prunes uninformative personal identifiers.
